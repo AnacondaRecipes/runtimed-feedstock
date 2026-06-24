@@ -1,44 +1,50 @@
-{% set name = "<PLEASE ADD PKG NAME>" %}
-{% set version = "<PLEASE ADD PKG VERSION>" %}
+{% set name = "runtimed" %}
+{% set version = "2.4.8" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
-
-source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: <sha256>
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-  skip: True  # [py<38]
+  skip: true  # [py<310]
 
 requirements:
   host:
-    - python
     - pip
+    - python
   run:
     - python
+    - pyzmq >=25.0
+    - ipykernel >=6.0
 
 test:
+  files:
+    - test.py
   imports:
-    - {{ name.replace('-', '.') }}
-  requires:
-    - pip
+    - runtimed
   commands:
     - pip check
+    - pytest -v --asyncio-mode=auto test.py
+  requires:
+    - pip
+    - pytest
+    - pytest-asyncio
 
 about:
-  home: <PLEASE ADD HOME URL>
-  summary: <PLEASE ADD SUMMARY>
+  home: https://pypi.org/project/runtimed
+  summary: Python toolkit for Jupyter runtimes, powered by runtimed Rust binaries
   description: |
-    <PLEASE ADD DESCRIPTION>
-  license: <PLEASE ADD LICENSE>
-  license_family: <PLEASE ADD LICENSE_FAMILY>
-  license_file: <PLEASE_ADD_LICENSE_FILE>
-  dev_url: <PLEASE ADD DEV URL>
-  doc_url: <PLEASE ADD DOC URL>
+    Python bindings for the nteract runtime daemon. Execute code, manage kernels, and interact with notebooks programmatically.
+    Download the nteract desktop app — it ships the runtimed daemon and gives you a visual interface for your notebooks.
+    Using runtimed with agents? The nteract MCP server is built on runtimed and provides a ready-made agentic interface for AI assistants.
+    It's also a great example of how to use runtimed in practice.
+  license: BSD-3-Clause
+  license_family: BSD
+  license_file: LICENSE
+  dev_url: https://pypi.org/project/runtimed
+  doc_url: https://pypi.org/project/runtimed
 
 extra:
   recipe-maintainers:

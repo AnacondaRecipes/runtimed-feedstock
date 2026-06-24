@@ -1,65 +1,51 @@
 {% set name = "runtimed" %}
 {% set version = "2.4.8" %}
+{% set release_hash = "202605142308" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
+sources:
+  url: https://github.com/nteract/nteract/archive/refs/tags/v{{ name }}-stable.{{ release_hash }}.tar.gz
+  sha256: a2370774a09dce603583ba29c3d75194d6622d15abd9ec4977e026380e2a8cf0
+
 build:
   number: 0
-  skip: true  # [py<310]
-  # Avaliable platforms:
-  # platform : Windows               wheel_tag : win_amd64               min_os : -
-  # platform : Linux                 wheel_tag : manylinux_2_39_x86_64   min_os : glibc 2.39+
-  # platform : macOS Intel           wheel_tag : macosx_10_12_x86_64     min_os : 10.12+
-  # platform : macOS Apple Silicon   wheel_tag : macosx_11_0_arm64       min_os : 11.0+
-  # Wheel file not avaliable on this platforms:
-  skip: true  # [linux and x86_64]
-  skip: true  # [linux and aarch64]
-  skip: true  # [win and x86_64]
+  script: {{ PYTHON }} -m pip install ./python/runtimed -vv --no-deps --no-build-isolation 
 
 requirements:
   build:
-    # curl is needed only for downloading whl files in build.sh and bld.bat
-    - curl
+    - {{ stdlib('c') }}
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   host:
     - pip
     - python
     - wheel
+    - maturin >=1.0,<2.0
   run:
     - python
-    - pyzmq >=25.0
+  run_constrained:
+    # kernel
     - ipykernel >=6.0
-    # otool -l ./runtimed/_internals.abi3.so | grep -A 50 LC_LOAD_DYLIB
-    # Load command 14
-    #      cmd LC_LOAD_DYLIB
-    #  cmdsize 56
-    #     name /usr/lib/libiconv.2.dylib (offset 24)
-    #  time stamp 2 Wed Dec 31 16:00:02 1969
-    #  current version 7.0.0
-    # compatibility version 7.0.0
-    # 7.0.0 -> compatible with libiconv 1.16, 1.17, 1.18
-    - libiconv >=1.16,<1.19  # [osx]
-    # objdump -p linux//runtimed/_internals.abi3.so
-    # Dynamic Section:
-    #  RPATH        $ORIGIN/../runtimed.libs
-    #  NEEDED       libssl-63597a81.so.3 —> vendored (IGNORE)
-    #  NEEDED       libcrypto-c19c2cf8.so.3 —> vendored (IGNORE)
-    #  NEEDED       libgcc_s.so.1
-    #  NEEDED       libm.so.6 —> system (IGNORE)
-    #  NEEDED       libc.so.6 —> system (IGNORE)
-    #  NEEDED       ld-linux-x86-64.so.2 —> system (IGNORE)
-    - libgcc-ng  # [linux]
-    - libstdcxx-ng  # [linux]
+    # bridge
+    - pyzmq >=25.0
 
-# Unable to run test from the readme: Needs running agent with MCP server in the nteract
 test:
+  source_files:
+    - python/runtimed/tests
   imports:
     - runtimed
   commands:
     - pip check
+    - pytest -v --asyncio-mode=auto python/runtimed/tests
   requires:
     - pip
+    - pytest >=8.0
+    - pytest-asyncio >=0.23
+    - ipykernel >=6.0
+    - pyzmq >=25.0
 
 about:
   home: https://pypi.org/project/runtimed
@@ -75,6 +61,3 @@ about:
   dev_url: https://pypi.org/project/runtimed
   doc_url: https://pypi.org/project/runtimed
 
-extra:
-  recipe-maintainers:
-    - Jrice1317

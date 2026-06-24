@@ -14,6 +14,7 @@ build:
   # platform : macOS Intel           wheel_tag : macosx_10_12_x86_64     min_os : 10.12+
   # platform : macOS Apple Silicon   wheel_tag : macosx_11_0_arm64       min_os : 11.0+
   # Wheel file not avaliable on this platforms:
+  skip: true  # [linux and x86_64]
   skip: true  # [linux and aarch64]
   skip: true  # [win and x86_64]
 
@@ -51,18 +52,14 @@ requirements:
     - libgcc-ng  # [linux]
     - libstdcxx-ng  # [linux]
 
+# Unable to run test from the readme: Needs running agent with MCP server in the nteract
 test:
-  files:
-    - test.py
   imports:
     - runtimed
   commands:
     - pip check
-    - pytest -v --asyncio-mode=auto test.py
   requires:
     - pip
-    - pytest
-    - pytest-asyncio
 
 about:
   home: https://pypi.org/project/runtimed

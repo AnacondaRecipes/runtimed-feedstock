@@ -11,13 +11,38 @@ build:
   skip: true  # [py<310]
 
 requirements:
+  build:
+    # curl is needed only for downloading whl files in build.sh and bld.bat
+    - curl
   host:
     - pip
     - python
+    - wheel
   run:
     - python
     - pyzmq >=25.0
     - ipykernel >=6.0
+    # otool -l ./runtimed/_internals.abi3.so | grep -A 50 LC_LOAD_DYLIB
+    # Load command 14
+    #      cmd LC_LOAD_DYLIB
+    #  cmdsize 56
+    #     name /usr/lib/libiconv.2.dylib (offset 24)
+    #  time stamp 2 Wed Dec 31 16:00:02 1969
+    #  current version 7.0.0
+    # compatibility version 7.0.0
+    # 7.0.0 -> compatible with libiconv 1.16, 1.17, 1.18
+    - libiconv >=1.16,<1.19  # [osx]
+    # objdump -p linux//runtimed/_internals.abi3.so
+    # Dynamic Section:
+    #  RPATH        $ORIGIN/../runtimed.libs
+    #  NEEDED       libssl-63597a81.so.3 —> vendored (IGNORE)
+    #  NEEDED       libcrypto-c19c2cf8.so.3 —> vendored (IGNORE)
+    #  NEEDED       libgcc_s.so.1
+    #  NEEDED       libm.so.6 —> system (IGNORE)
+    #  NEEDED       libc.so.6 —> system (IGNORE)
+    #  NEEDED       ld-linux-x86-64.so.2 —> system (IGNORE)
+    - libgcc-ng  # [linux]
+    - libstdcxx-ng  # [linux]
 
 test:
   files:

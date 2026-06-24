@@ -8,6 +8,14 @@ package:
 build:
   number: 0
   skip: true  # [py<310]
+  # Avaliable platforms:
+  # platform : Windows               wheel_tag : win_amd64               min_os : -
+  # platform : Linux                 wheel_tag : manylinux_2_39_x86_64   min_os : glibc 2.39+
+  # platform : macOS Intel           wheel_tag : macosx_10_12_x86_64     min_os : 10.12+
+  # platform : macOS Apple Silicon   wheel_tag : macosx_11_0_arm64       min_os : 11.0+
+  # Wheel file not avaliable on this platforms:
+  skip: true  # [linux and aarch64]
+  skip: true  # [win and x86_64]
 
 requirements:
   build:

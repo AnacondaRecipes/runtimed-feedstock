@@ -1,22 +1,22 @@
 {% set name = "runtimed" %}
 {% set version = "2.4.8" %}
+# STABLE RELEASE HASH
 {% set release_hash = "202605142308" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
-sources:
-  url: https://github.com/nteract/nteract/archive/refs/tags/v{{ name }}-stable.{{ release_hash }}.tar.gz
+source:
+  url: https://github.com/nteract/nteract/archive/refs/tags/v{{ version }}-stable.{{ release_hash }}.tar.gz
   sha256: a2370774a09dce603583ba29c3d75194d6622d15abd9ec4977e026380e2a8cf0
 
 build:
   number: 0
   script:
-    - cd %SRC_DIR%/python/runtimed  # [win]
-    - cd $SRC_DIR/python/runtimed  # [unix]
-    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - {{ PYTHON }} -m pip install ./python/runtimed -vv --no-deps --no-build-isolation
     - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml
+  skip: true  # [py<310]
 
 requirements:
   build:
@@ -53,7 +53,7 @@ test:
     - pyzmq >=25.0
 
 about:
-  home: https://pypi.org/project/runtimed
+  home: https://github.com/nteract/nteract/tree/main/python/runtimed
   summary: Python toolkit for Jupyter runtimes, powered by runtimed Rust binaries
   description: |
     Python bindings for the nteract runtime daemon. Execute code, manage kernels, and interact with notebooks programmatically.
@@ -65,6 +65,6 @@ about:
   license_file:
     - LICENSE
     - THIRDPARTY.yml
-  dev_url: https://pypi.org/project/runtimed
-  doc_url: https://pypi.org/project/runtimed
+  dev_url: https://github.com/nteract/nteract/tree/main/python/runtimed
+  doc_url: https://github.com/nteract/nteract/blob/main/python/runtimed/README.md
 
